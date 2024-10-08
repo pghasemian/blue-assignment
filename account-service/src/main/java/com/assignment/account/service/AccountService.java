@@ -1,12 +1,14 @@
 package com.assignment.account.service;
 
+
+import com.assignment.account.exception.AccountException;
 import com.assignment.account.model.Account;
 import com.assignment.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 
 /**
  * Service class for account-related operations.
@@ -14,34 +16,53 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AccountService {
+
     private final AccountRepository accountRepository;
     private final RestTemplate restTemplate;
 
-    /**
-     * Creates an account for a customer.
-     *
-     * @param customerId The ID of the customer.
-     * @param initialBalance The initial balance for the account.
-     * @return The created account.
-     */
-    public Account createAccount(Long customerId, Double initialBalance) {
-        // Validate customer by calling Customer Microservice
-        String customerServiceUrl = "http://CUSTOMER-SERVICE/customers/" + customerId;
-        restTemplate.getForObject(customerServiceUrl, Object.class); // Throws exception if customer not found
+    @Value("${customer.service.url}")
+    private String customerServiceUrl;
 
-        Account account = new Account();
-        account.setCustomerId(customerId);
-        account.setBalance(initialBalance);
+    @Value("${transaction.service.url}")
+    private String transactionServiceUrl;
+
+    /**
+     * Creates a new account for a customer.
+     *
+     * @param account the account to create
+     * @return the created Account
+     */
+    public Account createAccount(Account account) {
         return accountRepository.save(account);
     }
 
     /**
-     * Retrieves accounts by customer ID.
+     * Retrieves an account by ID.
      *
-     * @param customerId Customer ID.
-     * @return List of accounts associated with the customer.
+     * @param accountId the ID of the account
+     * @return the Account
      */
-    public List<Account> getAccountsByCustomerId(Long customerId) {
-        return accountRepository.findByCustomerId(customerId);
+    public Account getAccount(Long accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new AccountException("Account with ID " + accountId + " not found."));
+    }
+
+    /**
+     * Method to credit a specified amount to an account and create a transaction.
+     *
+     * @param accountId the ID of the account
+     * @param amount    the amount to credit
+     * @return updated Account
+     */
+    public Account creditAccount(Long accountId, Double amount) {
+        Account account = getAccount(accountId);
+        account.setBalance(account.getBalance() + amount);
+        accountRepository.save(account);
+
+        // Create a transaction
+        transactionServiceUrl = transactionServiceUrl + "/api/transactions"; // Assuming the endpoint is "/api/transactions"
+        restTemplate.postForEntity(transactionServiceUrl, new TransactionRequest(accountId, amount), Void.class);
+
+        return account;
     }
 }
