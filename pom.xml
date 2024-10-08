@@ -10,13 +10,19 @@
     <name>blue-assignment</name>
     <description>account and transaction management service</description>
 
+    <modules>
+        <module>customer-service</module>
+        <module>account-service</module>
+        <module>transaction-service</module>
+
+    </modules>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-parent</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
