@@ -1,13 +1,29 @@
 package com.assignment.account;
 
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 /**
- * Hello world!
- *
+ * The entry point of the Blue Harvest application.
+ * <p>
+ * This class is responsible for bootstrapping the Spring Boot application.
+ * The {@link SpringBootApplication} annotation enables auto-configuration,
+ * component scanning, and allows the application to be run
+ * as a standalone application.
  */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+
+@SpringBootApplication
+public class App {
+
+    /**
+     * The main method that serves as the entry point
+     * for the Spring Boot application.
+     *
+     * @param args command-line arguments passed to the application.
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
     }
 }
+

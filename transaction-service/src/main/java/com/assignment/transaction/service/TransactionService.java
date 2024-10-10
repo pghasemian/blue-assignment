@@ -1,6 +1,6 @@
 package com.assignment.transaction.service;
 
-import com.assignment.transaction.model.Transaction;
+import com.assignment.transaction.model.Transactions;
 import com.assignment.transaction.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,12 +23,10 @@ public class TransactionService {
      * @param accountId Account ID.
      * @param amount    Amount for the transaction.
      */
-    public Transaction createTransaction(Long accountId, Double amount) {
+    public Transactions createTransaction(Long accountId, Double amount) {
         // Validate account by calling Account Microservice
-        String accountServiceUrl = "http://ACCOUNT-SERVICE/accounts/" + accountId;
-        restTemplate.getForObject(accountServiceUrl, Object.class); // Throws exception if account not found
 
-        Transaction transaction = new Transaction();
+        Transactions transaction = new Transactions();
         transaction.setAccountId(accountId);
         transaction.setAmount(amount);
         return transactionRepository.save(transaction);
@@ -40,7 +38,7 @@ public class TransactionService {
      * @param accountId Account ID.
      * @return List of transactions associated with the account.
      */
-    public List<Transaction> getTransactionsByAccountId(Long accountId) {
+    public List<Transactions> getTransactionsByAccountId(Long accountId) {
         return transactionRepository.findByAccountId(accountId);
     }
 }

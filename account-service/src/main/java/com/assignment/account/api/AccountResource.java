@@ -1,11 +1,15 @@
 package com.assignment.account.api;
 
-import com.assignment.account.model.Account;
+import com.assignment.account.dto.AccountDTO;
+import com.assignment.account.dto.CustomerDTO;
 import com.assignment.account.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.naming.ServiceUnavailableException;
+import java.util.List;
 
 /**
  * Controller for account-related operations.
@@ -16,41 +20,30 @@ import org.springframework.web.bind.annotation.*;
 public class AccountResource {
 
     private final AccountService accountService;
-
     /**
-     * Endpoint to create a new account.
+     * Endpoint to create a new account for a specified customer.
      *
-     * @param account the account to create
-     * @return ResponseEntity with the created account and status
+     * @param customerId    the ID of the customer.
+     * @param initialCredit the initial credit for the new account.
+     * @return ResponseEntity containing the created AccountDTO and status.
      */
-    @PostMapping
-    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
-        Account createdAccount = accountService.createAccount(account);
+    @PostMapping("/create")
+    public ResponseEntity<AccountDTO> createAccount(@RequestParam Long customerId,
+                                                    @RequestParam Double initialCredit) throws ServiceUnavailableException {
+        AccountDTO createdAccount = accountService.createAccount(customerId, initialCredit);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
     }
 
     /**
-     * Endpoint to retrieve account information.
+     * Endpoint to retrieve account information for a specific customer.
      *
-     * @param accountId the ID of the account
-     * @return ResponseEntity with the account information and status
+     * @param customerId the ID of the customer.
+     * @return ResponseEntity containing a list of AccountDTOs and status.
      */
-    @GetMapping("/{accountId}")
-    public ResponseEntity<Account> getAccount(@PathVariable Long accountId) {
-        Account account = accountService.getAccount(accountId);
-        return ResponseEntity.ok(account);
+    @GetMapping("/account/{customerId}")
+    public ResponseEntity<CustomerDTO> getAccountsByCustomerId(@PathVariable Long customerId) throws ServiceUnavailableException {
+       CustomerDTO customerDTO = accountService.getCustomerAccountInfo(customerId);
+        return ResponseEntity.ok(customerDTO);
     }
 
-    /**
-     * Endpoint to credit an account.
-     *
-     * @param accountId the ID of the account
-     * @param amount    the amount to credit
-     * @return ResponseEntity with the updated account and status
-     */
-    @PostMapping("/{accountId}/credit")
-    public ResponseEntity<Account> creditAccount(@PathVariable Long accountId, @RequestParam Double amount) {
-        Account updatedAccount = accountService.creditAccount(accountId, amount);
-        return ResponseEntity.ok(updatedAccount);
-    }
 }

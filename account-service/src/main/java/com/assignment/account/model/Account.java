@@ -21,5 +21,5 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long customerId;
-    private Double balance;
+    private double balance;
 }
