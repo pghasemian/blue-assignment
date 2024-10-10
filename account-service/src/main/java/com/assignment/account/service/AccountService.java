@@ -1,6 +1,5 @@
 package com.assignment.account.service;
 
-
 import com.assignment.account.dto.AccountDTO;
 import com.assignment.account.dto.CustomerDTO;
 import com.assignment.account.dto.TransactionDTO;
@@ -8,6 +7,7 @@ import com.assignment.account.exception.CustomerNotFoundException;
 import com.assignment.account.mapper.AccountMapper;
 import com.assignment.account.model.Account;
 import com.assignment.account.repository.AccountRepository;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -19,7 +19,6 @@ import javax.naming.ServiceUnavailableException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 /**
  * Service class for account-related operations.
  */
@@ -27,16 +26,32 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccountService {
 
+    /**
+     * Repository for account data access.
+     */
     private final AccountRepository accountRepository;
+
+    /**
+     * Mapper for converting between Account and AccountDTO.
+     */
     private final AccountMapper accountMapper;
+
+    /**
+     * REST client for making external service calls.
+     */
     private final RestTemplate restTemplate;
 
+    /**
+     * URL for the customer service.
+     */
     @Value("${customer.service.url}")
     private String customerServiceUrl;
 
+    /**
+     * URL for the transaction service.
+     */
     @Value("${transaction.service.url}")
     private String transactionServiceUrl;
-
 
     /**
      * Creates a new account for the specified customer.
@@ -45,10 +60,11 @@ public class AccountService {
      * @param initialCredit the initial credit for the new account.
      * @return the created AccountDTO.
      * @throws CustomerNotFoundException   if the customer is not found.
-     * @throws ServiceUnavailableException if the customer service is unavailable.
+     * @throws ServiceUnavailableException if customer service is unavailable.
      */
-    public AccountDTO createAccount(final Long customerId, final Double initialCredit) throws ServiceUnavailableException {
-        // Constructing the URL to call the Customer Service for customer details
+    public AccountDTO createAccount(final Long customerId,
+                                    final Double initialCredit)
+            throws ServiceUnavailableException {
 
         try {
             // Fetching customer information
@@ -66,11 +82,10 @@ public class AccountService {
                 account.setBalance(initialCredit);
                 Account savedAccount = accountRepository.save(account);
                 AccountDTO accountDTO = accountMapper.toDTO(savedAccount);
-                // If initial credit is greater than zero, create a transaction for it.
                 if (initialCredit > 0) {
                     // Prepare transaction DTO
                     TransactionDTO transactionDTO = new TransactionDTO();
-                    transactionDTO.setAccountId(savedAccount.getId()); // Associate with the new account
+                    transactionDTO.setAccountId(savedAccount.getId());
                     transactionDTO.setAmount(initialCredit);
 
                     ResponseEntity<TransactionDTO> transactionResponse = restTemplate.postForEntity(
@@ -84,10 +99,12 @@ public class AccountService {
 
                 return accountDTO; // Return created account as DTO
             } else {
-                throw new CustomerNotFoundException("Customer with ID " + customerId + " not found.");
+                throw new CustomerNotFoundException(
+                        "Customer with ID " + customerId + " not found.");
             }
         } catch (Exception e) {
-            throw new ServiceUnavailableException("Customer Service is unavailable.");
+            throw new ServiceUnavailableException(
+                    "Customer Service is unavailable.");
         }
     }
 
@@ -97,10 +114,10 @@ public class AccountService {
      * @param customerId the ID of the customer.
      * @return DTO containing the customer's account information.
      * @throws CustomerNotFoundException   if the customer is not found.
-     * @throws ServiceUnavailableException if the customer service is unavailable.
+     * @throws ServiceUnavailableException if customer service is unavailable.
      */
-    public CustomerDTO getCustomerAccountInfo(final Long customerId) throws ServiceUnavailableException {
-        // Constructing the URL to call the Customer Service for customer details
+    public CustomerDTO getCustomerAccountInfo(final Long customerId)
+            throws ServiceUnavailableException {
 
         try {
             // Fetching customer information
@@ -116,15 +133,15 @@ public class AccountService {
                 List<AccountDTO> accountDTOs = accounts.stream()
                         .map(accountMapper::toDTO)
                         .collect(Collectors.toList());
-                for (AccountDTO accountDTO : accountDTOs) {
-                    TransactionDTO transactionResponse = restTemplate.getForObject(
-                            transactionServiceUrl + "/api/transactions/" + accountDTO.getId(), TransactionDTO.class);
+//                for (AccountDTO accountDTO : accountDTOs) {
+//                    TransactionDTO transactionResponse = restTemplate.getForObject(
+//                            transactionServiceUrl + "/api/transactions/" + accountDTO.getId(), TransactionDTO.class);
                     /*if (transactionResponse.getStatusCode().is2xxSuccessful()) {
                         List<TransactionDTO> transactionDTOS = new ArrayList<>();
                         transactionDTOS.add(transactionResponse.getBody());
                         accountDTO.setTransactions(transactionDTOS);
                     }*/
-                }
+//                }
 
                 double balance = accountDTOs.stream().mapToDouble(AccountDTO::getBalance).sum();
 
