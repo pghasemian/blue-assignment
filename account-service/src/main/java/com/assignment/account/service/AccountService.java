@@ -133,15 +133,15 @@ public class AccountService {
                 List<AccountDTO> accountDTOs = accounts.stream()
                         .map(accountMapper::toDTO)
                         .collect(Collectors.toList());
-                for (AccountDTO accountDTO : accountDTOs) {
-                    TransactionDTO transactionResponse = restTemplate.getForObject(
-                            transactionServiceUrl + "/api/transactions/" + accountDTO.getId(), TransactionDTO.class);
+//                for (AccountDTO accountDTO : accountDTOs) {
+//                    TransactionDTO transactionResponse = restTemplate.getForObject(
+//                            transactionServiceUrl + "/api/transactions/" + accountDTO.getId(), TransactionDTO.class);
                     /*if (transactionResponse.getStatusCode().is2xxSuccessful()) {
                         List<TransactionDTO> transactionDTOS = new ArrayList<>();
                         transactionDTOS.add(transactionResponse.getBody());
                         accountDTO.setTransactions(transactionDTOS);
                     }*/
-                }
+//                }
 
                 double balance = accountDTOs.stream().mapToDouble(AccountDTO::getBalance).sum();
 
