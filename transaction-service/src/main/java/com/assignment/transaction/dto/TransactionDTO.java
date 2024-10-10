@@ -10,10 +10,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TransactionDTO {
 
+    /**
+     * Unique identifier for the transaction.
+     */
     private Long id;
+
+    /**
+     * Unique identifier for the associated account.
+     */
     private Long accountId;
+
+    /**
+     * Amount of the transaction.
+     */
     private double amount;
 
-    // Additional fields can be added here based on requirements
 }
-

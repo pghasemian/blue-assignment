@@ -18,8 +18,10 @@ public class GlobalExceptionHandler {
      * @return ResponseEntity with error message and status
      */
     @ExceptionHandler(CustomerException.class)
-    public ResponseEntity<String> handleAccountException(CustomerException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<String> handleAccountException(
+            final CustomerException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
     }
 
     // You can add more exception handlers for different exception types here.

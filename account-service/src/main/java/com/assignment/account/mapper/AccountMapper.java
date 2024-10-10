@@ -10,8 +10,19 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
 
+    /**
+     * Converts an Account entity to an AccountDTO.
+     *
+     * @param account the Account entity to convert
+     * @return the converted AccountDTO
+     */
     AccountDTO toDTO(Account account);
 
+    /**
+     * Converts an AccountDTO to an Account entity.
+     *
+     * @param accountDTO the AccountDTO to convert
+     * @return the converted Account entity
+     */
     Account toEntity(AccountDTO accountDTO);
 }
-
